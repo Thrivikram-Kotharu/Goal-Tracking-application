@@ -68,12 +68,18 @@
         <h2 style="font-size: 28px; margin-bottom: var(--space-1);">Welcome back</h2>
         <p style="font-size: 13px; opacity: 0.7; margin-bottom: var(--space-4);">Sign in to keep your streaks going.</p>
         <div class="field" style="margin-bottom: var(--space-3);">
-          <label>Email</label>
+          <label>Email *</label>
           <input class="input" type="email" placeholder="you@example.com" value="{{ loginEmail }}" onChange="{{ onLoginEmailChange }}" />
+          <sc-if value="{{ loginEmailError }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: var(--color-danger);">{{ loginEmailError }}</span>
+          </sc-if>
         </div>
         <div class="field" style="margin-bottom: var(--space-4);">
-          <label>Password</label>
+          <label>Password *</label>
           <input class="input" type="password" placeholder="••••••••" value="{{ loginPassword }}" onChange="{{ onLoginPasswordChange }}" />
+          <sc-if value="{{ loginPasswordError }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: var(--color-danger);">{{ loginPasswordError }}</span>
+          </sc-if>
         </div>
         <button class="btn btn-primary btn-block" onClick="{{ doLogin }}">Sign in</button>
         <p style="font-size: 13px; text-align: center; margin-top: var(--space-3);">
@@ -88,18 +94,27 @@
         <h2 style="font-size: 28px; margin-bottom: var(--space-1);">Create your account</h2>
         <p style="font-size: 13px; opacity: 0.7; margin-bottom: var(--space-4);">Start tracking what matters to you.</p>
         <div class="field" style="margin-bottom: var(--space-3);">
-          <label>Name</label>
+          <label>Name *</label>
           <input class="input" type="text" placeholder="Your name" value="{{ signupName }}" onChange="{{ onSignupNameChange }}" />
+          <sc-if value="{{ signupNameError }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: var(--color-danger);">{{ signupNameError }}</span>
+          </sc-if>
         </div>
         <div class="field" style="margin-bottom: var(--space-3);">
-          <label>Email</label>
+          <label>Email *</label>
           <input class="input" type="email" placeholder="you@example.com" value="{{ signupEmail }}" onChange="{{ onSignupEmailChange }}" />
+          <sc-if value="{{ signupEmailError }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: var(--color-danger);">{{ signupEmailError }}</span>
+          </sc-if>
         </div>
         <div class="field" style="margin-bottom: var(--space-4);">
-          <label>Password</label>
+          <label>Password *</label>
           <input class="input" type="password" placeholder="••••••••" value="{{ signupPassword }}" onChange="{{ onSignupPasswordChange }}" />
+          <sc-if value="{{ signupPasswordError }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: var(--color-danger);">{{ signupPasswordError }}</span>
+          </sc-if>
         </div>
-        <button class="btn btn-primary btn-block" disabled="{{ signupDisabled }}" onClick="{{ doSignup }}">Create account</button>
+        <button class="btn btn-primary btn-block" onClick="{{ doSignup }}">Create account</button>
         <p style="font-size: 13px; text-align: center; margin-top: var(--space-3);">
           Already have an account? <button class="btn btn-ghost" style="padding: 0 0 0 4px; font-size: 13px;" onClick="{{ goToLogin }}">Sign in</button>
         </p>
@@ -182,22 +197,34 @@
         </sc-if>
 
         <div class="field" style="margin-bottom: var(--space-3);">
-          <label>Goal name</label>
+          <label>Goal name *</label>
           <input class="input" type="text" placeholder="e.g. Run a 5K" value="{{ setupName }}" onChange="{{ onNameChange }}" />
+          <sc-if value="{{ setupNameError }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: var(--color-danger);">{{ setupNameError }}</span>
+          </sc-if>
         </div>
 
-        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-3);">
+        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-3); align-items: flex-start;">
           <div class="field" style="flex: 1;">
-            <label>Starting point</label>
+            <label>Starting point *</label>
             <input class="input" type="text" placeholder="0" value="{{ setupStart }}" onChange="{{ onStartChange }}" />
+            <sc-if value="{{ setupStartError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12px; color: var(--color-danger);">{{ setupStartError }}</span>
+            </sc-if>
           </div>
           <div class="field" style="flex: 1;">
-            <label>Target</label>
+            <label>Target *</label>
             <input class="input" type="text" placeholder="100" value="{{ setupTarget }}" onChange="{{ onTargetChange }}" />
+            <sc-if value="{{ setupTargetError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12px; color: var(--color-danger);">{{ setupTargetError }}</span>
+            </sc-if>
           </div>
           <div class="field" style="flex: 1;">
-            <label>Unit</label>
+            <label>Unit *</label>
             <input class="input" type="text" placeholder="lbs, $, songs…" value="{{ setupUnit }}" onChange="{{ onUnitChange }}" />
+            <sc-if value="{{ setupUnitError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12px; color: var(--color-danger);">{{ setupUnitError }}</span>
+            </sc-if>
           </div>
         </div>
 
@@ -270,7 +297,7 @@
           </div>
         </div>
 
-        <button class="btn btn-primary btn-block" disabled="{{ setupDisabled }}" onClick="{{ createGoal }}">Create goal</button>
+        <button class="btn btn-primary btn-block" onClick="{{ createGoal }}">Create goal</button>
         <button class="btn btn-ghost btn-block" style="margin-top: var(--space-1);" onClick="{{ skipToDashboard }}">Cancel</button>
       </div>
     </sc-if>
@@ -397,29 +424,73 @@
               <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-3);">
                 <sc-for list="{{ selectedGoal.tasks }}" as="task" hint-placeholder-count="2">
                   <sc-if value="{{ task.isEditing }}" hint-placeholder-val="{{ false }}">
-                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) 0;">
-                      <input class="input" type="text" value="{{ editTaskLabel }}" onChange="{{ onEditLabelChange }}" style="flex: 1; min-width: 100px;" />
-                      <input class="input" type="text" placeholder="times" value="{{ editTaskTimes }}" onChange="{{ onEditTimesChange }}" style="width: 64px;" />
-                      <button class="btn btn-primary" onClick="{{ saveEditTask }}">Save</button>
-                      <button class="btn btn-ghost" onClick="{{ cancelEditTask }}">Cancel</button>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2) 0; border-bottom: 1px solid var(--color-divider); margin-bottom: var(--space-1);">
+                      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);">
+                        <input class="input" type="text" value="{{ editTaskLabel }}" onChange="{{ onEditLabelChange }}" style="flex: 1; min-width: 100px;" />
+                        <input class="input" type="text" placeholder="times" value="{{ editTaskTimes }}" onChange="{{ onEditTimesChange }}" style="width: 64px;" />
+                      </div>
+                      <div class="seg">
+                        <sc-for list="{{ editRepeatModes }}" as="rm" hint-placeholder-count="3">
+                          <label class="seg-opt">
+                            <input type="radio" name="editRepeatMode" checked="{{ rm.checked }}" onChange="{{ rm.onSelect }}" />
+                            {{ rm.label }}
+                          </label>
+                        </sc-for>
+                      </div>
+                      <sc-if value="{{ isEditRepeatCustom }}" hint-placeholder-val="{{ false }}">
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                          <sc-for list="{{ editRepeatDayOptions }}" as="d" hint-placeholder-count="7">
+                            <button class="{{ d.chipClass }}" style="border: none; cursor: pointer; padding: 3px 10px; font-size: 12px;" onClick="{{ d.onToggle }}">{{ d.label }}</button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                      <div style="display: flex; gap: var(--space-2);">
+                        <button class="btn btn-primary" onClick="{{ saveEditTask }}">Save</button>
+                        <button class="btn btn-ghost" onClick="{{ cancelEditTask }}">Cancel</button>
+                      </div>
                     </div>
                   </sc-if>
-                  <div style="display: {{ task.rowDisplay }}; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) 0;">
-                    <button onClick="{{ task.onToggle }}" style="width: 22px; height: 22px; flex: none; border-radius: var(--radius-sm); border: 1.5px solid {{ task.borderColor }}; background: {{ task.bgColor }}; color: var(--color-bg); font-size: 13px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">{{ task.check }}</button>
-                    <span style="flex: 1; font-size: 14px; opacity: {{ task.opacity }}; text-decoration: {{ task.strike }};">{{ task.label }}</span>
-                    <sc-if value="{{ task.isQty }}" hint-placeholder-val="{{ false }}">
-                      <span style="font-size: 12px; opacity: 0.6; white-space: nowrap;">{{ task.qtyLabel }}</span>
-                    </sc-if>
-                    <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 12px;" onClick="{{ task.onEdit }}">Edit</button>
-                    <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 12px;" onClick="{{ task.onDelete }}">Delete</button>
+                  <div style="display: {{ task.rowDisplay }}; flex-direction: column; gap: 4px; padding: var(--space-2) 0;">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);">
+                      <button onClick="{{ task.onToggle }}" style="width: 22px; height: 22px; flex: none; border-radius: var(--radius-sm); border: 1.5px solid {{ task.borderColor }}; background: {{ task.bgColor }}; color: var(--color-bg); font-size: 13px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">{{ task.check }}</button>
+                      <span style="flex: 1; font-size: 14px; opacity: {{ task.opacity }}; text-decoration: {{ task.strike }};">{{ task.label }}</span>
+                      <sc-if value="{{ task.isQty }}" hint-placeholder-val="{{ false }}">
+                        <span style="font-size: 12px; opacity: 0.6; white-space: nowrap;">{{ task.qtyLabel }}</span>
+                      </sc-if>
+                      <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 12px;" onClick="{{ task.onEdit }}">Edit</button>
+                      <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 12px;" onClick="{{ task.onDelete }}">Delete</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; padding-left: 30px;">
+                      <span class="tag tag-outline" style="font-size: 10px;">{{ task.repeatLabel }}</span>
+                    </div>
                   </div>
                 </sc-for>
               </div>
 
-              <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
-                <input class="input" type="text" placeholder="Add a task…" value="{{ newTaskLabel }}" onChange="{{ onNewTaskChange }}" onKeyDown="{{ onNewTaskKeyDown }}" style="flex: 1; min-width: 100px;" />
-                <input class="input" type="text" placeholder="times" value="{{ newTaskTimes }}" onChange="{{ onNewTaskTimesChange }}" onKeyDown="{{ onNewTaskKeyDown }}" style="width: 64px;" />
-                <button class="btn btn-secondary" disabled="{{ newTaskDisabled }}" onClick="{{ addTask }}">Add</button>
+              <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+                  <input class="input" type="text" placeholder="Add a task…" value="{{ newTaskLabel }}" onChange="{{ onNewTaskChange }}" onKeyDown="{{ onNewTaskKeyDown }}" style="flex: 1; min-width: 100px;" />
+                  <input class="input" type="text" placeholder="times" value="{{ newTaskTimes }}" onChange="{{ onNewTaskTimesChange }}" onKeyDown="{{ onNewTaskKeyDown }}" style="width: 64px;" />
+                </div>
+                <sc-if value="{{ newTaskError }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 12px; color: var(--color-danger);">{{ newTaskError }}</span>
+                </sc-if>
+                <div class="seg">
+                  <sc-for list="{{ newRepeatModes }}" as="rm" hint-placeholder-count="3">
+                    <label class="seg-opt">
+                      <input type="radio" name="newRepeatMode" checked="{{ rm.checked }}" onChange="{{ rm.onSelect }}" />
+                      {{ rm.label }}
+                    </label>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ isNewRepeatCustom }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <sc-for list="{{ newRepeatDayOptions }}" as="d" hint-placeholder-count="7">
+                      <button class="{{ d.chipClass }}" style="border: none; cursor: pointer; padding: 3px 10px; font-size: 12px;" onClick="{{ d.onToggle }}">{{ d.label }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <button class="btn btn-secondary" onClick="{{ addTask }}">Add task</button>
               </div>
             </div>
 
@@ -450,6 +521,16 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;avatarStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Runner&quot;,&quot;options&quot;:[&quot;Figure&quot;,&quot;Photo&quot;,&quot;Initials&quot;,&quot;Runner&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Progress marker&quot;}}">
 
 const CATEGORY_LIST = ['Fitness', 'Skill', 'Savings', 'Habit', 'Other'];
+const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function repeatLabelFor(task) {
+  if (task.repeatMode === 'Weekly') return 'Weekly';
+  if (task.repeatMode === 'Custom') {
+    const days = task.repeatDays && task.repeatDays.length ? task.repeatDays.join('/') : 'Pick days';
+    return days;
+  }
+  return 'Daily';
+}
 
 // Dark-mode token overrides — same hue/chroma family as the Broadsheet
 // light tokens, with perceptual lightness inverted (ramps reversed) so
@@ -522,9 +603,9 @@ function seedGoals() {
       startDate: '2026-04-01', endDate: '2026-09-01',
       tasksDoneWeek: 18, tasksTotalWeek: 21,
       tasks: [
-        { id: 't1', label: '30-min walk or workout', type: 'check', done: true },
-        { id: 't2', label: 'Log meals', type: 'check', done: true },
-        { id: 't3', label: 'Drink water', type: 'qty', qtyTarget: 8, qtyCurrent: 5, qtyUnit: 'cups' },
+        { id: 't1', label: '30-min walk or workout', type: 'check', done: true, repeatMode: 'Daily', repeatDays: [] },
+        { id: 't2', label: 'Log meals', type: 'check', done: true, repeatMode: 'Daily', repeatDays: [] },
+        { id: 't3', label: 'Drink water', type: 'qty', qtyTarget: 8, qtyCurrent: 5, qtyUnit: 'cups', repeatMode: 'Daily', repeatDays: [] },
       ],
       milestones: [
         { id: 'm1', label: 'Lost first 10 lbs', value: 180, done: true, achievedAt: '2026-05-02', deadline: '2026-05-01' },
@@ -539,8 +620,8 @@ function seedGoals() {
       startDate: '2026-01-01', endDate: '2026-12-31',
       tasksDoneWeek: 12, tasksTotalWeek: 14,
       tasks: [
-        { id: 't1', label: 'Practice', type: 'qty', qtyTarget: 20, qtyCurrent: 20, qtyUnit: 'min', done: true },
-        { id: 't2', label: 'Learn a new chord or riff', type: 'check', done: false },
+        { id: 't1', label: 'Practice', type: 'qty', qtyTarget: 20, qtyCurrent: 20, qtyUnit: 'min', done: true, repeatMode: 'Daily', repeatDays: [] },
+        { id: 't2', label: 'Learn a new chord or riff', type: 'check', done: false, repeatMode: 'Custom', repeatDays: ['Mon', 'Wed', 'Fri'] },
       ],
       milestones: [
         { id: 'm1', label: 'First song learned', value: 1, done: true, achievedAt: '2026-02-14', deadline: '2026-02-01' },
@@ -555,8 +636,8 @@ function seedGoals() {
       startDate: '2026-03-01', endDate: '2026-12-01',
       tasksDoneWeek: 6, tasksTotalWeek: 7,
       tasks: [
-        { id: 't1', label: "Log today's spending", type: 'check', done: true },
-        { id: 't2', label: 'Move money to savings', type: 'qty', qtyTarget: 20, qtyCurrent: 20, qtyUnit: '$' },
+        { id: 't1', label: "Log today's spending", type: 'check', done: true, repeatMode: 'Daily', repeatDays: [] },
+        { id: 't2', label: 'Move money to savings', type: 'qty', qtyTarget: 20, qtyCurrent: 20, qtyUnit: '$', repeatMode: 'Weekly', repeatDays: [] },
       ],
       milestones: [
         { id: 'm1', label: 'First $500 saved', value: 500, done: true, achievedAt: '2026-04-01', deadline: '2026-04-15' },
@@ -571,8 +652,8 @@ function seedGoals() {
       startDate: '2026-06-01', endDate: '2026-08-30',
       tasksDoneWeek: 7, tasksTotalWeek: 7,
       tasks: [
-        { id: 't1', label: 'Log a smoke-free day', type: 'check', done: true },
-        { id: 't2', label: 'Use craving tool when tempted', type: 'check', done: false },
+        { id: 't1', label: 'Log a smoke-free day', type: 'check', done: true, repeatMode: 'Daily', repeatDays: [] },
+        { id: 't2', label: 'Use craving tool when tempted', type: 'check', done: false, repeatMode: 'Daily', repeatDays: [] },
       ],
       milestones: [
         { id: 'm1', label: 'First week', value: 7, done: true, achievedAt: '2026-06-10', deadline: '2026-06-08' },
@@ -615,6 +696,14 @@ class Component extends DCLogic {
     editingTaskId: null,
     editTaskLabel: '',
     editTaskTimes: '',
+    newRepeatMode: 'Daily',
+    newRepeatDays: [],
+    editRepeatMode: 'Daily',
+    editRepeatDays: [],
+    loginErrors: {},
+    signupErrors: {},
+    setupErrors: {},
+    newTaskError: '',
     setupMilestones: [],
     setupMsLabel: '',
     setupMsValue: '',
@@ -642,12 +731,19 @@ class Component extends DCLogic {
 
   doLogin = () => {
     const s = this.state;
-    if (!s.loginEmail.trim()) return;
+    const errors = {};
+    if (!s.loginEmail.trim()) errors.email = 'Email is required';
+    if (!s.loginPassword.trim()) errors.password = 'Password is required';
+    if (Object.keys(errors).length) {
+      this.setState({ loginErrors: errors });
+      return;
+    }
     this.setState({
       userEmail: s.loginEmail,
       userName: s.userName || s.loginEmail.split('@')[0],
       screen: 'dashboard',
       loginPassword: '',
+      loginErrors: {},
     });
   };
 
@@ -657,12 +753,20 @@ class Component extends DCLogic {
 
   doSignup = () => {
     const s = this.state;
-    if (!s.signupName.trim() || !s.signupEmail.trim() || !s.signupPassword) return;
+    const errors = {};
+    if (!s.signupName.trim()) errors.name = 'Name is required';
+    if (!s.signupEmail.trim()) errors.email = 'Email is required';
+    if (!s.signupPassword.trim()) errors.password = 'Password is required';
+    if (Object.keys(errors).length) {
+      this.setState({ signupErrors: errors });
+      return;
+    }
     this.setState({
       userName: s.signupName,
       userEmail: s.signupEmail,
       screen: 'onboarding',
       signupPassword: '',
+      signupErrors: {},
     });
   };
 
@@ -722,6 +826,15 @@ class Component extends DCLogic {
 
   createGoal = () => {
     const s = this.state;
+    const errors = {};
+    if (!s.setupName.trim()) errors.name = 'Goal name is required';
+    if (s.setupStart.trim() === '' || isNaN(parseFloat(s.setupStart))) errors.start = 'Starting point is required';
+    if (s.setupTarget.trim() === '' || isNaN(parseFloat(s.setupTarget))) errors.target = 'Target is required';
+    if (!s.setupUnit.trim()) errors.unit = 'Unit is required';
+    if (Object.keys(errors).length) {
+      this.setState({ setupErrors: errors });
+      return;
+    }
     const start = parseFloat(s.setupStart) || 0;
     const target = parseFloat(s.setupTarget) || 100;
     const category = s.setupCategory === 'Other' ? (s.setupCustomCategory || 'Custom') : s.setupCategory;
@@ -752,6 +865,7 @@ class Component extends DCLogic {
       setupMilestones: [], setupMsLabel: '', setupMsValue: '',
       setupStartDate: todayISO(), setupDeadlineMode: 'date', setupEndDate: '', setupDeadlineDays: '',
       setupMsDeadlineMode: 'date', setupMsDeadlineDate: '', setupMsDeadlineDays: '',
+      setupErrors: {},
     });
   };
 
@@ -795,21 +909,32 @@ class Component extends DCLogic {
 
   onNewTaskChange = (e) => this.setState({ newTaskLabel: e.target.value });
   onNewTaskTimesChange = (e) => this.setState({ newTaskTimes: e.target.value });
+  selectNewRepeatMode = (mode) => this.setState({ newRepeatMode: mode });
+  toggleNewRepeatDay = (day) => {
+    const days = this.state.newRepeatDays;
+    this.setState({ newRepeatDays: days.includes(day) ? days.filter((d) => d !== day) : [...days, day] });
+  };
 
   addTask = () => {
-    const label = this.state.newTaskLabel.trim();
-    if (!label) return;
-    const times = parseInt(this.state.newTaskTimes, 10);
-    const goalId = this.state.selectedGoalId;
+    const s = this.state;
+    const label = s.newTaskLabel.trim();
+    if (!label) {
+      this.setState({ newTaskError: 'Task name is required' });
+      return;
+    }
+    const times = parseInt(s.newTaskTimes, 10);
+    const goalId = s.selectedGoalId;
+    const repeatMode = s.newRepeatMode;
+    const repeatDays = repeatMode === 'Custom' ? s.newRepeatDays : [];
     const goals = this.state.goals.map((g) => {
       if (g.id !== goalId) return g;
       const newTask = times && times > 1
-        ? { id: 't' + Date.now(), label, type: 'qty', qtyTarget: times, qtyCurrent: 0, qtyUnit: 'times' }
-        : { id: 't' + Date.now(), label, type: 'check', done: false };
+        ? { id: 't' + Date.now(), label, type: 'qty', qtyTarget: times, qtyCurrent: 0, qtyUnit: 'times', repeatMode, repeatDays }
+        : { id: 't' + Date.now(), label, type: 'check', done: false, repeatMode, repeatDays };
       const tasks = [...g.tasks, newTask];
       return { ...g, tasks, tasksTotalWeek: g.tasksTotalWeek + 1 };
     });
-    this.setState({ goals, newTaskLabel: '', newTaskTimes: '' });
+    this.setState({ goals, newTaskLabel: '', newTaskTimes: '', newRepeatMode: 'Daily', newRepeatDays: [], newTaskError: '' });
   };
 
   onNewTaskKeyDown = (e) => {
@@ -821,32 +946,42 @@ class Component extends DCLogic {
       editingTaskId: task.id,
       editTaskLabel: task.label,
       editTaskTimes: task.type === 'qty' ? String(task.qtyTarget) : '',
+      editRepeatMode: task.repeatMode || 'Daily',
+      editRepeatDays: task.repeatDays ? [...task.repeatDays] : [],
     });
   };
 
-  cancelEditTask = () => this.setState({ editingTaskId: null, editTaskLabel: '', editTaskTimes: '' });
+  cancelEditTask = () => this.setState({ editingTaskId: null, editTaskLabel: '', editTaskTimes: '', editRepeatMode: 'Daily', editRepeatDays: [] });
 
   onEditLabelChange = (e) => this.setState({ editTaskLabel: e.target.value });
   onEditTimesChange = (e) => this.setState({ editTaskTimes: e.target.value });
+  selectEditRepeatMode = (mode) => this.setState({ editRepeatMode: mode });
+  toggleEditRepeatDay = (day) => {
+    const days = this.state.editRepeatDays;
+    this.setState({ editRepeatDays: days.includes(day) ? days.filter((d) => d !== day) : [...days, day] });
+  };
 
   saveEditTask = () => {
-    const label = this.state.editTaskLabel.trim();
+    const s = this.state;
+    const label = s.editTaskLabel.trim();
     if (!label) return;
-    const times = parseInt(this.state.editTaskTimes, 10);
-    const goalId = this.state.selectedGoalId;
-    const taskId = this.state.editingTaskId;
+    const times = parseInt(s.editTaskTimes, 10);
+    const goalId = s.selectedGoalId;
+    const taskId = s.editingTaskId;
+    const repeatMode = s.editRepeatMode;
+    const repeatDays = repeatMode === 'Custom' ? s.editRepeatDays : [];
     const goals = this.state.goals.map((g) => {
       if (g.id !== goalId) return g;
       const tasks = g.tasks.map((t) => {
         if (t.id !== taskId) return t;
         if (times && times > 1) {
-          return { id: t.id, label, type: 'qty', qtyTarget: times, qtyCurrent: Math.min(t.qtyCurrent || 0, times), qtyUnit: t.qtyUnit || 'times' };
+          return { id: t.id, label, type: 'qty', qtyTarget: times, qtyCurrent: Math.min(t.qtyCurrent || 0, times), qtyUnit: t.qtyUnit || 'times', repeatMode, repeatDays };
         }
-        return { id: t.id, label, type: 'check', done: t.done || false };
+        return { id: t.id, label, type: 'check', done: t.done || false, repeatMode, repeatDays };
       });
       return { ...g, tasks };
     });
-    this.setState({ goals, editingTaskId: null, editTaskLabel: '', editTaskTimes: '' });
+    this.setState({ goals, editingTaskId: null, editTaskLabel: '', editTaskTimes: '', editRepeatMode: 'Daily', editRepeatDays: [] });
   };
 
   deleteTask = (goalId, taskId) => {
@@ -968,6 +1103,7 @@ class Component extends DCLogic {
             rowDisplay: isEditing ? 'none' : 'flex',
             onEdit: () => this.startEditTask(t),
             onDelete: () => this.deleteTask(g.id, t.id),
+            repeatLabel: repeatLabelFor(t),
           };
         }),
         milestones: g.milestones.map((m) => {
@@ -1028,7 +1164,6 @@ class Component extends DCLogic {
       signupName: s.signupName, onSignupNameChange: this.onSignupNameChange,
       signupEmail: s.signupEmail, onSignupEmailChange: this.onSignupEmailChange,
       signupPassword: s.signupPassword, onSignupPasswordChange: this.onSignupPasswordChange,
-      signupDisabled: !s.signupName.trim() || !s.signupEmail.trim() || !s.signupPassword,
       doSignup: this.doSignup,
       logout: this.logout,
       userName: s.userName || 'You',
@@ -1056,7 +1191,7 @@ class Component extends DCLogic {
       setupTarget: s.setupTarget, onTargetChange: this.onTargetChange,
       setupUnit: s.setupUnit, onUnitChange: this.onUnitChange,
       frequencies,
-      setupDisabled: !s.setupName,
+      setupDisabled: false,
       dashboardGoals,
       noGoals: dashboardGoals.length === 0,
       selectedGoal,
@@ -1067,13 +1202,41 @@ class Component extends DCLogic {
       onNewTaskTimesChange: this.onNewTaskTimesChange,
       onNewTaskKeyDown: this.onNewTaskKeyDown,
       addTask: this.addTask,
-      newTaskDisabled: !s.newTaskLabel.trim(),
+      newTaskDisabled: false,
+      newTaskError: s.newTaskError,
+      loginEmailError: s.loginErrors.email,
+      loginPasswordError: s.loginErrors.password,
+      signupNameError: s.signupErrors.name,
+      signupEmailError: s.signupErrors.email,
+      signupPasswordError: s.signupErrors.password,
+      setupNameError: s.setupErrors.name,
+      setupStartError: s.setupErrors.start,
+      setupTargetError: s.setupErrors.target,
+      setupUnitError: s.setupErrors.unit,
       editTaskLabel: s.editTaskLabel,
       editTaskTimes: s.editTaskTimes,
       onEditLabelChange: this.onEditLabelChange,
       onEditTimesChange: this.onEditTimesChange,
       saveEditTask: this.saveEditTask,
       cancelEditTask: this.cancelEditTask,
+      newRepeatModes: ['Daily', 'Weekly', 'Custom'].map((m) => ({
+        label: m, checked: s.newRepeatMode === m, onSelect: () => this.selectNewRepeatMode(m),
+      })),
+      isNewRepeatCustom: s.newRepeatMode === 'Custom',
+      newRepeatDayOptions: WEEK_DAYS.map((d) => ({
+        label: d,
+        chipClass: 'tag ' + (s.newRepeatDays.includes(d) ? 'tag-accent' : 'tag-outline'),
+        onToggle: () => this.toggleNewRepeatDay(d),
+      })),
+      editRepeatModes: ['Daily', 'Weekly', 'Custom'].map((m) => ({
+        label: m, checked: s.editRepeatMode === m, onSelect: () => this.selectEditRepeatMode(m),
+      })),
+      isEditRepeatCustom: s.editRepeatMode === 'Custom',
+      editRepeatDayOptions: WEEK_DAYS.map((d) => ({
+        label: d,
+        chipClass: 'tag ' + (s.editRepeatDays.includes(d) ? 'tag-accent' : 'tag-outline'),
+        onToggle: () => this.toggleEditRepeatDay(d),
+      })),
       setupMilestones: s.setupMilestones.map((m) => ({
         id: m.id,
         display: m.label + ' — at ' + m.value + (m.deadline ? ' (by ' + fmtDate(m.deadline) + ')' : ''),
