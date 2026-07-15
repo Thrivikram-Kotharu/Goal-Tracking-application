@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="ds/styles.css">
+  <script src="ds/ds-bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--color-bg); }
+    a { color: var(--color-accent-700); }
+    a:hover { color: var(--color-accent); }
+    ::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+    :root {
+      --color-success: oklch(48% 0.13 155);
+      --color-success-bg: oklch(94% 0.045 155);
+      --color-danger: oklch(48% 0.17 25);
+      --color-danger-bg: oklch(94% 0.045 25);
+    }
+    @keyframes flashIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes runnerBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    @keyframes runnerLegA { 0%, 100% { transform: rotate(35deg); } 50% { transform: rotate(-35deg); } }
+    @keyframes runnerLegB { 0%, 100% { transform: rotate(-35deg); } 50% { transform: rotate(35deg); } }
+    @keyframes runnerArmA { 0%, 100% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } }
+    @keyframes runnerArmB { 0%, 100% { transform: rotate(30deg); } 50% { transform: rotate(-30deg); } }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; justify-content: center; padding: var(--space-6) var(--space-4) var(--space-8); background: var(--color-bg); color-scheme: {{ colorScheme }}; {{ themeVars }}">
+  <div style="width: 100%; max-width: 560px;">
+
+    <!-- Masthead -->
+    <div style="margin-bottom: var(--space-6);">
+      <div style="border-top: 4px solid var(--color-text); padding-top: 6px;">
+        <div style="border-top: 1px solid var(--color-text); padding-top: var(--space-2); display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); position: relative;">
+          <h1 style="font-size: 26px; margin: 0; letter-spacing: -0.01em;">The Daily Gains</h1>
+          <div style="display: flex; align-items: center; gap: var(--space-3);">
+            <div style="font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent); white-space: nowrap;">{{ dateline }}</div>
+            <sc-if value="{{ isAuthed }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ toggleMenu }}" aria-label="Menu" style="width: 28px; height: 28px; border: none; background: transparent; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 4px; padding: 0; flex: none;">
+                <span style="display: block; width: 100%; height: 2px; background: var(--color-text);"></span>
+                <span style="display: block; width: 100%; height: 2px; background: var(--color-text);"></span>
+                <span style="display: block; width: 70%; height: 2px; background: var(--color-text);"></span>
+              </button>
+            </sc-if>
+          </div>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; right: 0; top: 100%; margin-top: var(--space-2); background: var(--color-surface); box-shadow: var(--shadow-md); border-radius: var(--radius-md); padding: var(--space-2); display: flex; flex-direction: column; min-width: 190px; z-index: 20;">
+              <div style="padding: var(--space-2); font-size: 13px; opacity: 0.7;">{{ userName }}</div>
+              <button class="btn btn-ghost" style="justify-content: flex-start;" onClick="{{ goToDashboardFromMenu }}">Dashboard</button>
+              <button class="btn btn-ghost" style="justify-content: flex-start;" onClick="{{ goToProfileFromMenu }}">Profile &amp; settings</button>
+              <div class="hr" style="margin: var(--space-1) var(--space-2);"></div>
+              <button class="btn btn-ghost" style="justify-content: flex-start;" onClick="{{ logout }}">Log out</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <h2 style="font-size: 28px; margin-bottom: var(--space-1);">Welcome back</h2>
+        <p style="font-size: 13px; opacity: 0.7; margin-bottom: var(--space-4);">Sign in to keep your streaks going.</p>
+        <div class="field" style="margin-bottom: var(--space-3);">
+          <label>Email</label>
+          <input class="input" type="email" placeholder="you@example.com" value="{{ loginEmail }}" onChange="{{ onLoginEmailChange }}" />
+        </div>
+        <div class="field" style="margin-bottom: var(--space-4);">
+          <label>Password</label>
+          <input class="input" type="password" placeholder="••••••••" value="{{ loginPassword }}" onChange="{{ onLoginPasswordChange }}" />
+        </div>
+        <button class="btn btn-primary btn-block" onClick="{{ doLogin }}">Sign in</button>
+        <p style="font-size: 13px; text-align: center; margin-top: var(--space-3);">
+          New here? <button class="btn btn-ghost" style="padding: 0 0 0 4px; font-size: 13px;" onClick="{{ goToSignup }}">Create an account</button>
+        </p>
+      </div>
+    </sc-if>
+
+    <!-- SIGNUP -->
+    <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <h2 style="font-size: 28px; margin-bottom: var(--space-1);">Create your account</h2>
+        <p style="font-size: 13px; opacity: 0.7; margin-bottom: var(--space-4);">Start tracking what matters to you.</p>
+        <div class="field" style="margin-bottom: var(--space-3);">
+          <label>Name</label>
+          <input class="input" type="text" placeholder="Your name" value="{{ signupName }}" onChange="{{ onSignupNameChange }}" />
+        </div>
+        <div class="field" style="margin-bottom: var(--space-3);">
+          <label>Email</label>
+          <input class="input" type="email" placeholder="you@example.com" value="{{ signupEmail }}" onChange="{{ onSignupEmailChange }}" />
+        </div>
+        <div class="field" style="margin-bottom: var(--space-4);">
+          <label>Password</label>
+          <input class="input" type="password" placeholder="••••••••" value="{{ signupPassword }}" onChange="{{ onSignupPasswordChange }}" />
+        </div>
+        <button class="btn btn-primary btn-block" disabled="{{ signupDisabled }}" onClick="{{ doSignup }}">Create account</button>
+        <p style="font-size: 13px; text-align: center; margin-top: var(--space-3);">
+          Already have an account? <button class="btn btn-ghost" style="padding: 0 0 0 4px; font-size: 13px;" onClick="{{ goToLogin }}">Sign in</button>
+        </p>
+      </div>
+    </sc-if>
+
+    <!-- PROFILE -->
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <button class="btn btn-ghost" style="padding-left: 0; margin-bottom: var(--space-3);" onClick="{{ goToDashboard }}">← Back</button>
+        <h2 style="margin-bottom: var(--space-4);">Profile &amp; settings</h2>
+
+        <div class="field" style="margin-bottom: var(--space-3);">
+          <label>Name</label>
+          <input class="input" type="text" value="{{ userName }}" onChange="{{ onUserNameChange }}" />
+        </div>
+        <div class="field" style="margin-bottom: var(--space-4);">
+          <label>Email</label>
+          <input class="input" type="email" value="{{ userEmail }}" disabled="{{ true }}" />
+        </div>
+
+        <div class="field" style="margin-bottom: var(--space-4);">
+          <label>Appearance</label>
+          <div class="seg">
+            <sc-for list="{{ themeModes }}" as="tm" hint-placeholder-count="2">
+              <label class="seg-opt">
+                <input type="radio" name="themeMode" checked="{{ tm.checked }}" onChange="{{ tm.onSelect }}" />
+                {{ tm.label }}
+              </label>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5);">
+          <span style="font-size: 14px;">Daily reminder notifications</span>
+          <button onClick="{{ toggleNotifPrefs }}" style="width: 40px; height: 22px; border-radius: 11px; border: none; cursor: pointer; background: {{ notifBg }}; position: relative; padding: 0; flex: none;">
+            <span style="position: absolute; top: 2px; left: {{ notifKnobLeft }}; width: 18px; height: 18px; border-radius: 50%; background: var(--color-bg); transition: left 0.2s ease;"></span>
+          </button>
+        </div>
+
+        <button class="btn btn-secondary btn-block" onClick="{{ logout }}">Log out</button>
+      </div>
+    </sc-if>
+
+    <!-- ONBOARDING -->
+    <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ true }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <h6 style="color: var(--color-accent-700); margin-bottom: var(--space-2);">Issue No. 1</h6>
+        <h2 style="font-size: 34px; margin-bottom: var(--space-3);">Track anything worth improving.</h2>
+        <p style="font-size: 15px; opacity: 0.85; max-width: 40ch; margin-bottom: var(--space-4);">
+          Fat to fit. Beginner to guitarist. Broke to booked for Japan. Whatever the goal, break it into daily tasks and milestones — and watch the number climb.
+        </p>
+
+        <div style="aspect-ratio: 16/10; background: repeating-linear-gradient(45deg, var(--color-neutral-300), var(--color-neutral-300) 2px, var(--color-neutral-200) 2px, var(--color-neutral-200) 10px); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4); width: 464px; height: 273px">
+          <span style="font-family: monospace; font-size: 11px; color: color-mix(in srgb, var(--color-text) 55%, transparent); background: var(--color-bg); padding: 4px 10px; border-radius: var(--radius-sm);">photo: someone mid-progress</span>
+        </div>
+
+        <button class="btn btn-primary btn-block" onClick="{{ goToSetup }}">Begin tracking</button>
+        <button class="btn btn-ghost btn-block" style="margin-top: var(--space-1);" onClick="{{ skipToDashboard }}">I already have goals</button>
+      </div>
+    </sc-if>
+
+    <!-- SETUP -->
+    <sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <h2 style="font-size: 28px; margin-bottom: var(--space-1);">What are you working toward?</h2>
+        <p style="font-size: 13px; opacity: 0.7; margin-bottom: var(--space-4);">Pick a category, then fill in the details.</p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);">
+          <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+            <button class="{{ cat.chipClass }}" style="border: none; cursor: pointer; font-family: var(--font-heading); font-weight: var(--font-heading-weight);" onClick="{{ cat.onSelect }}">{{ cat.label }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isOtherCategory }}" hint-placeholder-val="{{ false }}">
+          <div class="field" style="margin-bottom: var(--space-3);">
+            <label>Name your category</label>
+            <input class="input" type="text" placeholder="e.g. Reading, French, Sleep" value="{{ setupCustomCategory }}" onChange="{{ onCustomCategoryChange }}" />
+          </div>
+        </sc-if>
+
+        <div class="field" style="margin-bottom: var(--space-3);">
+          <label>Goal name</label>
+          <input class="input" type="text" placeholder="e.g. Run a 5K" value="{{ setupName }}" onChange="{{ onNameChange }}" />
+        </div>
+
+        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-3);">
+          <div class="field" style="flex: 1;">
+            <label>Starting point</label>
+            <input class="input" type="text" placeholder="0" value="{{ setupStart }}" onChange="{{ onStartChange }}" />
+          </div>
+          <div class="field" style="flex: 1;">
+            <label>Target</label>
+            <input class="input" type="text" placeholder="100" value="{{ setupTarget }}" onChange="{{ onTargetChange }}" />
+          </div>
+          <div class="field" style="flex: 1;">
+            <label>Unit</label>
+            <input class="input" type="text" placeholder="lbs, $, songs…" value="{{ setupUnit }}" onChange="{{ onUnitChange }}" />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-3);">
+          <div class="field" style="flex: 1;">
+            <label>Start date</label>
+            <input class="input" type="date" value="{{ setupStartDate }}" onChange="{{ onSetupStartDateChange }}" />
+          </div>
+          <div class="field" style="flex: 1;">
+            <label>Finish by</label>
+            <div class="seg" style="margin-bottom: var(--space-1); width: 100%;">
+              <sc-for list="{{ deadlineModes }}" as="dm" hint-placeholder-count="2">
+                <label class="seg-opt" style="flex: 1; justify-content: center;">
+                  <input type="radio" name="deadlineMode" checked="{{ dm.checked }}" onChange="{{ dm.onSelect }}" />
+                  {{ dm.label }}
+                </label>
+              </sc-for>
+            </div>
+            <sc-if value="{{ isDeadlineModeDate }}" hint-placeholder-val="{{ true }}">
+              <input class="input" type="date" value="{{ setupEndDate }}" onChange="{{ onSetupEndDateChange }}" />
+            </sc-if>
+            <sc-if value="{{ isDeadlineModeDays }}" hint-placeholder-val="{{ false }}">
+              <input class="input" type="text" placeholder="days to reach, e.g. 60" value="{{ setupDeadlineDays }}" onChange="{{ onSetupDeadlineDaysChange }}" />
+            </sc-if>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom: var(--space-4);">
+          <label>Check in</label>
+          <div class="seg">
+            <sc-for list="{{ frequencies }}" as="freq" hint-placeholder-count="2">
+              <label class="seg-opt">
+                <input type="radio" name="freq" checked="{{ freq.checked }}" onChange="{{ freq.onSelect }}" />
+                {{ freq.label }}
+              </label>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom: var(--space-4);">
+          <label>Milestones (optional — added evenly if left blank)</label>
+          <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <sc-for list="{{ setupMilestones }}" as="ms" hint-placeholder-count="0">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); font-size: 13px;">
+                <span>{{ ms.display }}</span>
+                <button class="btn btn-ghost" style="padding: 2px 8px;" onClick="{{ ms.onRemove }}">Remove</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <input class="input" type="text" placeholder="Label (e.g. Halfway there)" value="{{ setupMsLabel }}" onChange="{{ onMsLabelChange }}" style="flex: 2;" />
+            <input class="input" type="text" placeholder="At value" value="{{ setupMsValue }}" onChange="{{ onMsValueChange }}" style="flex: 1;" />
+          </div>
+          <div style="display: flex; gap: var(--space-2); align-items: center;">
+            <div class="seg">
+              <sc-for list="{{ msDeadlineModes }}" as="dm" hint-placeholder-count="2">
+                <label class="seg-opt">
+                  <input type="radio" name="msDeadlineMode" checked="{{ dm.checked }}" onChange="{{ dm.onSelect }}" />
+                  {{ dm.label }}
+                </label>
+              </sc-for>
+            </div>
+            <sc-if value="{{ isMsDeadlineModeDate }}" hint-placeholder-val="{{ true }}">
+              <input class="input" type="date" value="{{ setupMsDeadlineDate }}" onChange="{{ onMsDeadlineDateChange }}" style="flex: 1;" />
+            </sc-if>
+            <sc-if value="{{ isMsDeadlineModeDays }}" hint-placeholder-val="{{ false }}">
+              <input class="input" type="text" placeholder="days from start" value="{{ setupMsDeadlineDays }}" onChange="{{ onMsDeadlineDaysChange }}" style="flex: 1;" />
+            </sc-if>
+            <button class="btn btn-secondary" disabled="{{ setupMsDisabled }}" onClick="{{ addSetupMilestone }}">Add</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" disabled="{{ setupDisabled }}" onClick="{{ createGoal }}">Create goal</button>
+        <button class="btn btn-ghost btn-block" style="margin-top: var(--space-1);" onClick="{{ skipToDashboard }}">Cancel</button>
+      </div>
+    </sc-if>
+
+    <!-- DASHBOARD -->
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--space-4);">
+          <h2 style="margin: 0;">Your goals</h2>
+          <button class="btn btn-ghost" onClick="{{ goToSetup }}">+ Add goal</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <sc-for list="{{ dashboardGoals }}" as="goal" hint-placeholder-count="3">
+            <div class="card elev-sm" style="cursor: pointer;" onClick="{{ goal.onOpen }}">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="card-kicker">{{ goal.category }}</span>
+                <span class="tag tag-accent">{{ goal.streakLabel }}</span>
+              </div>
+              <h3 class="card-title" style="margin: 2px 0 0;">{{ goal.name }}</h3>
+              <p class="card-body" style="margin: 4px 0 0;">{{ goal.valueLabel }}</p>
+              <div style="height: 6px; background: var(--color-neutral-200); border-radius: var(--radius-sm); overflow: hidden; margin: var(--space-1) 0;">
+                <div style="height: 100%; background: var(--color-accent); width: {{ goal.pctWidth }};"></div>
+              </div>
+              <div class="card-meta">
+                <span>{{ goal.tasksLabel }}</span>
+                <span>·</span>
+                <span>{{ goal.milestonesLabel }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ noGoals }}" hint-placeholder-val="{{ false }}">
+          <p style="opacity: 0.65; font-size: 14px;">No goals yet — add your first one above.</p>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- DETAIL -->
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="animation: flashIn 0.35s ease;">
+        <button class="btn btn-ghost" style="padding-left: 0; margin-bottom: var(--space-3);" onClick="{{ goToDashboard }}">← All goals</button>
+
+        <sc-if value="{{ selectedGoal }}" hint-placeholder-val="{{ false }}">
+          <span class="tag tag-accent">{{ selectedGoal.category }}</span>
+          <h2 style="margin: var(--space-1) 0 var(--space-4);">{{ selectedGoal.name }}</h2>
+
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--space-3);">
+            <div class="cmyk-num" style="font-size: 40px; font-weight: 600; font-family: var(--font-heading);">
+              <span class="paper">{{ selectedGoal.pctLabel }}</span>
+              <span class="plate plate-c" aria-hidden="true">{{ selectedGoal.pctLabel }}</span>
+              <span class="plate plate-m" aria-hidden="true">{{ selectedGoal.pctLabel }}</span>
+              <span class="plate plate-y" aria-hidden="true">{{ selectedGoal.pctLabel }}</span>
+            </div>
+            <p style="margin: 0; font-size: 13px; opacity: 0.75;">{{ selectedGoal.valueLabel }}</p>
+          </div>
+
+          <div style="position: relative; padding-top: 50px; margin-bottom: var(--space-4);">
+            <div style="position: absolute; top: 0; left: {{ selectedGoal.markerLeft }}; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; transition: left 0.6s ease-in-out;">
+              <sc-if value="{{ selectedGoal.avatarIsFigure }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                  <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent);"></div>
+                  <div style="width: 18px; height: 22px; border-radius: var(--radius-md); background: var(--color-accent);"></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ selectedGoal.avatarIsInitials }}" hint-placeholder-val="{{ false }}">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-accent); color: var(--color-bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-weight: 600; font-size: 15px;">{{ selectedGoal.initial }}</div>
+              </sc-if>
+              <sc-if value="{{ selectedGoal.avatarIsPhoto }}" hint-placeholder-val="{{ false }}">
+                <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; box-shadow: var(--shadow-sm);">
+                  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ selectedGoal.avatarId }}" shape="circle" placeholder="photo" hint-size="40px,40px"></x-import>
+                </div>
+              </sc-if>
+              <sc-if value="{{ selectedGoal.avatarIsRunner }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; align-items: center; animation: runnerBob 0.5s ease-in-out infinite; animation-play-state: {{ selectedGoal.runPlayState }};">
+                  <div style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent); margin-bottom: 1px;"></div>
+                  <div style="position: relative; width: 26px; height: 20px;">
+                    <div style="position: absolute; left: 1px; top: 1px; width: 4px; height: 13px; background: var(--color-accent-700); border-radius: 2px; transform-origin: top center; animation: runnerArmA 0.5s ease-in-out infinite; animation-play-state: {{ selectedGoal.runPlayState }};"></div>
+                    <div style="position: absolute; right: 1px; top: 1px; width: 4px; height: 13px; background: var(--color-accent-700); border-radius: 2px; transform-origin: top center; animation: runnerArmB 0.5s ease-in-out infinite; animation-play-state: {{ selectedGoal.runPlayState }};"></div>
+                    <div style="position: absolute; left: 9px; top: 0; width: 8px; height: 12px; background: var(--color-accent); border-radius: 2px;"></div>
+                    <div style="position: absolute; left: 7px; top: 10px; width: 5px; height: 12px; background: var(--color-accent); border-radius: 2px; transform-origin: top center; animation: runnerLegA 0.5s ease-in-out infinite; animation-play-state: {{ selectedGoal.runPlayState }};"></div>
+                    <div style="position: absolute; left: 14px; top: 10px; width: 5px; height: 12px; background: var(--color-accent); border-radius: 2px; transform-origin: top center; animation: runnerLegB 0.5s ease-in-out infinite; animation-play-state: {{ selectedGoal.runPlayState }};"></div>
+                  </div>
+                </div>
+              </sc-if>
+              <div style="width: 2px; height: 10px; background: var(--color-neutral-400); margin-top: 2px;"></div>
+            </div>
+
+            <div style="height: 6px; background: var(--color-neutral-200); border-radius: var(--radius-sm); overflow: visible; position: relative;">
+              <div style="height: 100%; background: var(--color-accent); border-radius: var(--radius-sm); width: {{ selectedGoal.pctWidth }};"></div>
+              <sc-for list="{{ selectedGoal.milestones }}" as="ms" hint-placeholder-count="4">
+                <div style="position: absolute; top: 50%; left: {{ ms.tickLeft }}; transform: translate(-50%, -50%);">
+                  <sc-if value="{{ ms.showTooltip }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--color-text); color: var(--color-bg); font-size: 11px; padding: 4px 8px; border-radius: var(--radius-sm); z-index: 2;">{{ ms.tooltipText }}</div>
+                  </sc-if>
+                  <div title="{{ ms.tooltipText }}" onClick="{{ ms.onToggleTooltip }}" style="width: 14px; height: 14px; transform: rotate(45deg); background: {{ ms.tickColor }}; border: 2px solid var(--color-bg); cursor: pointer;"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6;">Start</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; display: flex; align-items: center; gap: 4px;">
+                <span style="width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent var(--color-accent-2);"></span>
+                Finish
+              </span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); flex-wrap: wrap;">
+            <span class="tag tag-accent">{{ selectedGoal.streakLabel }}</span>
+            <span class="tag tag-neutral">{{ selectedGoal.tasksLabel }}</span>
+            <span class="tag tag-neutral">{{ selectedGoal.milestonesLabel }}</span>
+            <span style="display: inline-flex; align-items: center; font-size: 11px; padding: 3px 10px; border-radius: calc(var(--radius-md) * 0.75); color: {{ selectedGoal.goalDaysColor }}; background: {{ selectedGoal.goalDaysBg }};">{{ selectedGoal.goalDaysText }}</span>
+          </div>
+
+          <sc-if value="{{ celebrateMessage }}" hint-placeholder-val="{{ false }}">
+            <div class="tag tag-accent-2" style="display: block; padding: var(--space-2) var(--space-3); font-size: 13px; margin-bottom: var(--space-4); animation: flashIn 0.3s ease;">{{ celebrateMessage }}</div>
+          </sc-if>
+
+          <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-start;">
+            <div style="flex: 1 1 220px; min-width: 220px;">
+              <h4 style="margin-bottom: var(--space-2);">Today's tasks</h4>
+              <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-3);">
+                <sc-for list="{{ selectedGoal.tasks }}" as="task" hint-placeholder-count="2">
+                  <sc-if value="{{ task.isEditing }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) 0;">
+                      <input class="input" type="text" value="{{ editTaskLabel }}" onChange="{{ onEditLabelChange }}" style="flex: 1; min-width: 100px;" />
+                      <input class="input" type="text" placeholder="times" value="{{ editTaskTimes }}" onChange="{{ onEditTimesChange }}" style="width: 64px;" />
+                      <button class="btn btn-primary" onClick="{{ saveEditTask }}">Save</button>
+                      <button class="btn btn-ghost" onClick="{{ cancelEditTask }}">Cancel</button>
+                    </div>
+                  </sc-if>
+                  <div style="display: {{ task.rowDisplay }}; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) 0;">
+                    <button onClick="{{ task.onToggle }}" style="width: 22px; height: 22px; flex: none; border-radius: var(--radius-sm); border: 1.5px solid {{ task.borderColor }}; background: {{ task.bgColor }}; color: var(--color-bg); font-size: 13px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">{{ task.check }}</button>
+                    <span style="flex: 1; font-size: 14px; opacity: {{ task.opacity }}; text-decoration: {{ task.strike }};">{{ task.label }}</span>
+                    <sc-if value="{{ task.isQty }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size: 12px; opacity: 0.6; white-space: nowrap;">{{ task.qtyLabel }}</span>
+                    </sc-if>
+                    <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 12px;" onClick="{{ task.onEdit }}">Edit</button>
+                    <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 12px;" onClick="{{ task.onDelete }}">Delete</button>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+                <input class="input" type="text" placeholder="Add a task…" value="{{ newTaskLabel }}" onChange="{{ onNewTaskChange }}" onKeyDown="{{ onNewTaskKeyDown }}" style="flex: 1; min-width: 100px;" />
+                <input class="input" type="text" placeholder="times" value="{{ newTaskTimes }}" onChange="{{ onNewTaskTimesChange }}" onKeyDown="{{ onNewTaskKeyDown }}" style="width: 64px;" />
+                <button class="btn btn-secondary" disabled="{{ newTaskDisabled }}" onClick="{{ addTask }}">Add</button>
+              </div>
+            </div>
+
+            <div style="flex: 1 1 220px; min-width: 220px;">
+              <h4 style="margin-bottom: var(--space-2);">Milestones</h4>
+              <div class="card" style="display: flex; flex-direction: column; gap: var(--space-3);">
+                <sc-for list="{{ selectedGoal.milestones }}" as="ms" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                      <span style="font-size: 14px; opacity: {{ ms.opacity }};">{{ ms.label }}</span>
+                      <span style="font-size: 11px; opacity: 0.55;">{{ ms.deadlineLabel }}</span>
+                    </div>
+                    <span style="display: inline-flex; align-items: center; white-space: nowrap; font-size: 11px; padding: 3px 10px; border-radius: calc(var(--radius-md) * 0.75); color: {{ ms.statusColor }}; background: {{ ms.statusBg }};">{{ ms.statusText }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="height: var(--space-5);"></div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;avatarStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Runner&quot;,&quot;options&quot;:[&quot;Figure&quot;,&quot;Photo&quot;,&quot;Initials&quot;,&quot;Runner&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Progress marker&quot;}}">
+
+const CATEGORY_LIST = ['Fitness', 'Skill', 'Savings', 'Habit', 'Other'];
+
+// Dark-mode token overrides — same hue/chroma family as the Broadsheet
+// light tokens, with perceptual lightness inverted (ramps reversed) so
+// tinted fills/text-on-fill pairings still hold their contrast relationship.
+const DARK_THEME_VARS = [
+  '--color-bg:#1c1b1a', '--color-surface:#262524', '--color-text:#eeecea',
+  '--color-divider:color-mix(in srgb, #eeecea 16%, transparent)',
+  '--color-neutral-100:#2d2b2b', '--color-neutral-200:#444141', '--color-neutral-300:#605d5d',
+  '--color-neutral-400:#7d7979', '--color-neutral-500:#9b9797', '--color-neutral-600:#bab6b6',
+  '--color-neutral-700:#d7d3d3', '--color-neutral-800:#eae7e7', '--color-neutral-900:#f8f4f4',
+  '--color-accent:#4fb8dd',
+  '--color-accent-100:#0a303e', '--color-accent-200:#004961', '--color-accent-300:#006786',
+  '--color-accent-400:#1186ac', '--color-accent-500:#38a6cf', '--color-accent-600:#62c5ee',
+  '--color-accent-700:#99e0ff', '--color-accent-800:#cbeeff', '--color-accent-900:#e9f8ff',
+  '--color-accent-2:#ff6fae',
+  '--color-accent-2-100:#4b1528', '--color-accent-2-200:#790e3d', '--color-accent-2-300:#aa0b56',
+  '--color-accent-2-400:#d82071', '--color-accent-2-500:#ff458e', '--color-accent-2-600:#ff90b1',
+  '--color-accent-2-700:#ffc0d0', '--color-accent-2-800:#ffdee6', '--color-accent-2-900:#fff1f4',
+  '--color-success:#7dd6a8', '--color-success-bg:#1f3a2c',
+  '--color-danger:#ff9c8a', '--color-danger-bg:#3a2420',
+  '--shadow-sm:0 1px 2px rgba(0,0,0,0.4)', '--shadow-md:0 3px 10px rgba(0,0,0,0.45)', '--shadow-lg:0 12px 32px rgba(0,0,0,0.55)',
+].join(';');
+
+function makeMilestones(start, target) {
+  const steps = [0.25, 0.5, 0.75, 1];
+  return steps.map((s, i) => ({
+    id: 'm' + i,
+    value: Math.round(start + (target - start) * s),
+    label: i === steps.length - 1 ? 'Goal reached' : Math.round(s * 100) + '% of the way there',
+    done: false,
+  }));
+}
+
+function pctOf(value, start, target) {
+  const range = target - start;
+  if (!range) return 0;
+  return Math.max(0, Math.min(1, (value - start) / range));
+}
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+function addDaysISO(dateStr, days) {
+  const base = dateStr || todayISO();
+  const d = new Date(base + 'T00:00:00');
+  d.setDate(d.getDate() + (parseInt(days, 10) || 0));
+  return d.toISOString().slice(0, 10);
+}
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date(todayISO() + 'T00:00:00');
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+function fmtDate(dateStr) {
+  if (!dateStr) return '';
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function dateAtFraction(startDate, endDate, frac) {
+  const s = new Date(startDate + 'T00:00:00');
+  const e = new Date(endDate + 'T00:00:00');
+  return new Date(s.getTime() + (e.getTime() - s.getTime()) * frac).toISOString().slice(0, 10);
+}
+
+function seedGoals() {
+  return [
+    {
+      id: 1, name: 'Fat → Fit', category: 'Fitness', unit: 'lbs',
+      start: 190, current: 171, target: 160, streak: 12,
+      startDate: '2026-04-01', endDate: '2026-09-01',
+      tasksDoneWeek: 18, tasksTotalWeek: 21,
+      tasks: [
+        { id: 't1', label: '30-min walk or workout', type: 'check', done: true },
+        { id: 't2', label: 'Log meals', type: 'check', done: true },
+        { id: 't3', label: 'Drink water', type: 'qty', qtyTarget: 8, qtyCurrent: 5, qtyUnit: 'cups' },
+      ],
+      milestones: [
+        { id: 'm1', label: 'Lost first 10 lbs', value: 180, done: true, achievedAt: '2026-05-02', deadline: '2026-05-01' },
+        { id: 'm2', label: 'Halfway there', value: 175, done: true, achievedAt: '2026-06-10', deadline: '2026-06-15' },
+        { id: 'm3', label: 'Under 170 lbs', value: 170, done: false, deadline: '2026-07-10' },
+        { id: 'm4', label: 'Goal weight — 160 lbs', value: 160, done: false, deadline: '2026-09-01' },
+      ],
+    },
+    {
+      id: 2, name: 'Learn Guitar', category: 'Skill', unit: 'songs',
+      start: 0, current: 6, target: 20, streak: 27,
+      startDate: '2026-01-01', endDate: '2026-12-31',
+      tasksDoneWeek: 12, tasksTotalWeek: 14,
+      tasks: [
+        { id: 't1', label: 'Practice', type: 'qty', qtyTarget: 20, qtyCurrent: 20, qtyUnit: 'min', done: true },
+        { id: 't2', label: 'Learn a new chord or riff', type: 'check', done: false },
+      ],
+      milestones: [
+        { id: 'm1', label: 'First song learned', value: 1, done: true, achievedAt: '2026-02-14', deadline: '2026-02-01' },
+        { id: 'm2', label: '5 songs learned', value: 5, done: true, achievedAt: '2026-05-20', deadline: '2026-06-01' },
+        { id: 'm3', label: 'Play a full album side', value: 12, done: false, deadline: '2026-08-01' },
+        { id: 'm4', label: '20 songs — goal!', value: 20, done: false, deadline: '2026-12-31' },
+      ],
+    },
+    {
+      id: 3, name: 'Save for Japan Trip', category: 'Savings', unit: '$',
+      start: 0, current: 2350, target: 5000, streak: 8,
+      startDate: '2026-03-01', endDate: '2026-12-01',
+      tasksDoneWeek: 6, tasksTotalWeek: 7,
+      tasks: [
+        { id: 't1', label: "Log today's spending", type: 'check', done: true },
+        { id: 't2', label: 'Move money to savings', type: 'qty', qtyTarget: 20, qtyCurrent: 20, qtyUnit: '$' },
+      ],
+      milestones: [
+        { id: 'm1', label: 'First $500 saved', value: 500, done: true, achievedAt: '2026-04-01', deadline: '2026-04-15' },
+        { id: 'm2', label: 'Halfway — $2,500', value: 2500, done: false, deadline: '2026-07-01' },
+        { id: 'm3', label: '$4,000 saved', value: 4000, done: false, deadline: '2026-10-01' },
+        { id: 'm4', label: 'Trip funded — $5,000', value: 5000, done: false, deadline: '2026-12-01' },
+      ],
+    },
+    {
+      id: 4, name: 'Quit Smoking', category: 'Habit', unit: 'days smoke-free',
+      start: 0, current: 34, target: 90, streak: 34,
+      startDate: '2026-06-01', endDate: '2026-08-30',
+      tasksDoneWeek: 7, tasksTotalWeek: 7,
+      tasks: [
+        { id: 't1', label: 'Log a smoke-free day', type: 'check', done: true },
+        { id: 't2', label: 'Use craving tool when tempted', type: 'check', done: false },
+      ],
+      milestones: [
+        { id: 'm1', label: 'First week', value: 7, done: true, achievedAt: '2026-06-10', deadline: '2026-06-08' },
+        { id: 'm2', label: 'One month', value: 30, done: true, achievedAt: '2026-07-03', deadline: '2026-07-03' },
+        { id: 'm3', label: '60 days', value: 60, done: false, deadline: '2026-07-31' },
+        { id: 'm4', label: '90 days — quit for good', value: 90, done: false, deadline: '2026-08-30' },
+      ],
+    },
+  ];
+}
+
+class Component extends DCLogic {
+  state = {
+    screen: 'login',
+    selectedGoalId: null,
+    menuOpen: false,
+    loginEmail: '',
+    loginPassword: '',
+    signupName: '',
+    signupEmail: '',
+    signupPassword: '',
+    userName: '',
+    userEmail: '',
+    notifPrefs: true,
+    theme: 'light',
+    goals: seedGoals(),
+    setupCategory: 'Fitness',
+    setupCustomCategory: '',
+    setupName: '',
+    setupStart: '',
+    setupTarget: '',
+    setupUnit: '',
+    setupFrequency: 'Daily',
+    celebrateMessage: null,
+    newTaskLabel: '',
+    newTaskTimes: '',
+    activeMilestoneId: null,
+    markerResetGoalId: null,
+    runningGoalId: null,
+    editingTaskId: null,
+    editTaskLabel: '',
+    editTaskTimes: '',
+    setupMilestones: [],
+    setupMsLabel: '',
+    setupMsValue: '',
+    setupStartDate: todayISO(),
+    setupDeadlineMode: 'date',
+    setupEndDate: '',
+    setupDeadlineDays: '',
+    setupMsDeadlineMode: 'date',
+    setupMsDeadlineDate: '',
+    setupMsDeadlineDays: '',
+  };
+
+  goToSetup = () => this.setState({ screen: 'setup' });
+  goToDashboard = () => this.setState({ screen: 'dashboard', celebrateMessage: null });
+  skipToDashboard = () => this.setState({ screen: 'dashboard' });
+
+  toggleMenu = () => this.setState({ menuOpen: !this.state.menuOpen });
+  goToDashboardFromMenu = () => this.setState({ screen: 'dashboard', menuOpen: false });
+  goToProfileFromMenu = () => this.setState({ screen: 'profile', menuOpen: false });
+
+  onLoginEmailChange = (e) => this.setState({ loginEmail: e.target.value });
+  onLoginPasswordChange = (e) => this.setState({ loginPassword: e.target.value });
+  goToSignup = () => this.setState({ screen: 'signup' });
+  goToLogin = () => this.setState({ screen: 'login' });
+
+  doLogin = () => {
+    const s = this.state;
+    if (!s.loginEmail.trim()) return;
+    this.setState({
+      userEmail: s.loginEmail,
+      userName: s.userName || s.loginEmail.split('@')[0],
+      screen: 'dashboard',
+      loginPassword: '',
+    });
+  };
+
+  onSignupNameChange = (e) => this.setState({ signupName: e.target.value });
+  onSignupEmailChange = (e) => this.setState({ signupEmail: e.target.value });
+  onSignupPasswordChange = (e) => this.setState({ signupPassword: e.target.value });
+
+  doSignup = () => {
+    const s = this.state;
+    if (!s.signupName.trim() || !s.signupEmail.trim() || !s.signupPassword) return;
+    this.setState({
+      userName: s.signupName,
+      userEmail: s.signupEmail,
+      screen: 'onboarding',
+      signupPassword: '',
+    });
+  };
+
+  logout = () => {
+    this.setState({
+      screen: 'login', menuOpen: false,
+      loginEmail: '', loginPassword: '',
+    });
+  };
+
+  onUserNameChange = (e) => this.setState({ userName: e.target.value });
+  toggleNotifPrefs = () => this.setState({ notifPrefs: !this.state.notifPrefs });
+  selectTheme = (theme) => this.setState({ theme });
+
+  selectGoal = (id) => this.setState({ screen: 'detail', selectedGoalId: id, celebrateMessage: null });
+
+  selectCategory = (cat) => this.setState({ setupCategory: cat });
+  onCustomCategoryChange = (e) => this.setState({ setupCustomCategory: e.target.value });
+  onNameChange = (e) => this.setState({ setupName: e.target.value });
+  onStartChange = (e) => this.setState({ setupStart: e.target.value });
+  onTargetChange = (e) => this.setState({ setupTarget: e.target.value });
+  onUnitChange = (e) => this.setState({ setupUnit: e.target.value });
+  selectFrequency = (f) => this.setState({ setupFrequency: f });
+
+  onMsLabelChange = (e) => this.setState({ setupMsLabel: e.target.value });
+  onMsValueChange = (e) => this.setState({ setupMsValue: e.target.value });
+  onSetupStartDateChange = (e) => this.setState({ setupStartDate: e.target.value });
+  selectDeadlineMode = (mode) => this.setState({ setupDeadlineMode: mode });
+  onSetupEndDateChange = (e) => this.setState({ setupEndDate: e.target.value });
+  onSetupDeadlineDaysChange = (e) => this.setState({ setupDeadlineDays: e.target.value });
+  selectMsDeadlineMode = (mode) => this.setState({ setupMsDeadlineMode: mode });
+  onMsDeadlineDateChange = (e) => this.setState({ setupMsDeadlineDate: e.target.value });
+  onMsDeadlineDaysChange = (e) => this.setState({ setupMsDeadlineDays: e.target.value });
+
+  addSetupMilestone = () => {
+    const s = this.state;
+    const label = s.setupMsLabel.trim();
+    const value = parseFloat(s.setupMsValue);
+    if (!label || isNaN(value)) return;
+    const start = s.setupStartDate || todayISO();
+    const deadline = s.setupMsDeadlineMode === 'days'
+      ? (s.setupMsDeadlineDays ? addDaysISO(start, s.setupMsDeadlineDays) : '')
+      : s.setupMsDeadlineDate;
+    this.setState({
+      setupMilestones: [...s.setupMilestones, { id: 'sm' + Date.now(), label, value, deadline }],
+      setupMsLabel: '', setupMsValue: '', setupMsDeadlineDate: '', setupMsDeadlineDays: '',
+    });
+  };
+
+  removeSetupMilestone = (id) => {
+    this.setState({ setupMilestones: this.state.setupMilestones.filter((m) => m.id !== id) });
+  };
+
+  toggleMilestoneTooltip = (id) => {
+    this.setState({ activeMilestoneId: this.state.activeMilestoneId === id ? null : id });
+  };
+
+  createGoal = () => {
+    const s = this.state;
+    const start = parseFloat(s.setupStart) || 0;
+    const target = parseFloat(s.setupTarget) || 100;
+    const category = s.setupCategory === 'Other' ? (s.setupCustomCategory || 'Custom') : s.setupCategory;
+    const startDate = s.setupStartDate || todayISO();
+    const endDate = s.setupDeadlineMode === 'days'
+      ? addDaysISO(startDate, s.setupDeadlineDays || 30)
+      : (s.setupEndDate || addDaysISO(startDate, 30));
+    const newGoal = {
+      id: Date.now(),
+      name: s.setupName || 'New goal',
+      category,
+      unit: s.setupUnit || '',
+      start, current: start, target,
+      startDate, endDate,
+      streak: 0,
+      tasksDoneWeek: 0, tasksTotalWeek: s.setupFrequency === 'Daily' ? 7 : 1,
+      tasks: [{ id: 't1', label: 'Complete a check-in', type: 'check', done: false }],
+      milestones: s.setupMilestones.length
+        ? s.setupMilestones.map((m, i) => ({ id: 'm' + i, label: m.label, value: m.value, deadline: m.deadline, done: false }))
+        : makeMilestones(start, target).map((m, i) => ({ ...m, deadline: dateAtFraction(startDate, endDate, [0.25, 0.5, 0.75, 1][i]) })),
+    };
+    this.setState({
+      goals: [...s.goals, newGoal],
+      screen: 'detail',
+      selectedGoalId: newGoal.id,
+      celebrateMessage: 'Goal created — let’s go!',
+      setupName: '', setupStart: '', setupTarget: '', setupUnit: '', setupCustomCategory: '',
+      setupMilestones: [], setupMsLabel: '', setupMsValue: '',
+      setupStartDate: todayISO(), setupDeadlineMode: 'date', setupEndDate: '', setupDeadlineDays: '',
+      setupMsDeadlineMode: 'date', setupMsDeadlineDate: '', setupMsDeadlineDays: '',
+    });
+  };
+
+  toggleTask = (goalId, taskId) => {
+    const goals = this.state.goals.map((g) => {
+      if (g.id !== goalId) return g;
+      const tasks = g.tasks.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t));
+      const wasIncomplete = g.tasks.find((t) => t.id === taskId && !t.done);
+      const delta = wasIncomplete ? 1 : -1;
+      return { ...g, tasks, tasksDoneWeek: Math.max(0, Math.min(g.tasksTotalWeek, g.tasksDoneWeek + delta)) };
+    });
+    this.setState({ goals });
+    const nowDone = goals.find((x) => x.id === goalId)?.tasks.find((t) => t.id === taskId)?.done;
+    if (nowDone) {
+      this.flashCelebrate('Nice work — task complete!');
+      this.playRunAnimation(goalId);
+    }
+  };
+
+  bumpQty = (goalId, taskId) => {
+    const goals = this.state.goals.map((g) => {
+      if (g.id !== goalId) return g;
+      const wasComplete = g.tasks.find((x) => x.id === taskId).qtyCurrent >= g.tasks.find((x) => x.id === taskId).qtyTarget;
+      const tasks = g.tasks.map((t) => {
+        if (t.id !== taskId) return t;
+        // clicking a completed quantity task resets it (uncheck); otherwise bump by one
+        const qtyCurrent = wasComplete ? 0 : Math.min(t.qtyTarget, (t.qtyCurrent || 0) + 1);
+        return { ...t, qtyCurrent };
+      });
+      const nowComplete = tasks.find((x) => x.id === taskId).qtyCurrent >= tasks.find((x) => x.id === taskId).qtyTarget;
+      const delta = nowComplete && !wasComplete ? 1 : (!nowComplete && wasComplete ? -1 : 0);
+      return { ...g, tasks, tasksDoneWeek: Math.max(0, Math.min(g.tasksTotalWeek, g.tasksDoneWeek + delta)) };
+    });
+    this.setState({ goals });
+    const t = goals.find((x) => x.id === goalId)?.tasks.find((x) => x.id === taskId);
+    if (t && t.qtyCurrent >= t.qtyTarget) {
+      this.flashCelebrate('Nice work — task complete!');
+      this.playRunAnimation(goalId);
+    }
+  };
+
+  onNewTaskChange = (e) => this.setState({ newTaskLabel: e.target.value });
+  onNewTaskTimesChange = (e) => this.setState({ newTaskTimes: e.target.value });
+
+  addTask = () => {
+    const label = this.state.newTaskLabel.trim();
+    if (!label) return;
+    const times = parseInt(this.state.newTaskTimes, 10);
+    const goalId = this.state.selectedGoalId;
+    const goals = this.state.goals.map((g) => {
+      if (g.id !== goalId) return g;
+      const newTask = times && times > 1
+        ? { id: 't' + Date.now(), label, type: 'qty', qtyTarget: times, qtyCurrent: 0, qtyUnit: 'times' }
+        : { id: 't' + Date.now(), label, type: 'check', done: false };
+      const tasks = [...g.tasks, newTask];
+      return { ...g, tasks, tasksTotalWeek: g.tasksTotalWeek + 1 };
+    });
+    this.setState({ goals, newTaskLabel: '', newTaskTimes: '' });
+  };
+
+  onNewTaskKeyDown = (e) => {
+    if (e.key === 'Enter') this.addTask();
+  };
+
+  startEditTask = (task) => {
+    this.setState({
+      editingTaskId: task.id,
+      editTaskLabel: task.label,
+      editTaskTimes: task.type === 'qty' ? String(task.qtyTarget) : '',
+    });
+  };
+
+  cancelEditTask = () => this.setState({ editingTaskId: null, editTaskLabel: '', editTaskTimes: '' });
+
+  onEditLabelChange = (e) => this.setState({ editTaskLabel: e.target.value });
+  onEditTimesChange = (e) => this.setState({ editTaskTimes: e.target.value });
+
+  saveEditTask = () => {
+    const label = this.state.editTaskLabel.trim();
+    if (!label) return;
+    const times = parseInt(this.state.editTaskTimes, 10);
+    const goalId = this.state.selectedGoalId;
+    const taskId = this.state.editingTaskId;
+    const goals = this.state.goals.map((g) => {
+      if (g.id !== goalId) return g;
+      const tasks = g.tasks.map((t) => {
+        if (t.id !== taskId) return t;
+        if (times && times > 1) {
+          return { id: t.id, label, type: 'qty', qtyTarget: times, qtyCurrent: Math.min(t.qtyCurrent || 0, times), qtyUnit: t.qtyUnit || 'times' };
+        }
+        return { id: t.id, label, type: 'check', done: t.done || false };
+      });
+      return { ...g, tasks };
+    });
+    this.setState({ goals, editingTaskId: null, editTaskLabel: '', editTaskTimes: '' });
+  };
+
+  deleteTask = (goalId, taskId) => {
+    const goals = this.state.goals.map((g) => {
+      if (g.id !== goalId) return g;
+      return { ...g, tasks: g.tasks.filter((t) => t.id !== taskId), tasksTotalWeek: Math.max(0, g.tasksTotalWeek - 1) };
+    });
+    this.setState({ goals });
+  };
+
+  playRunAnimation = (goalId) => {
+    clearTimeout(this._runResetTimer);
+    clearTimeout(this._runStopTimer);
+    this.setState({ markerResetGoalId: goalId, runningGoalId: goalId });
+    this._runResetTimer = setTimeout(() => {
+      this.setState({ markerResetGoalId: null });
+    }, 30);
+    this._runStopTimer = setTimeout(() => {
+      this.setState({ runningGoalId: null });
+    }, 900);
+  };
+
+  flashCelebrate = (msg) => {
+    this.setState({ celebrateMessage: msg });
+    clearTimeout(this._celTimer);
+    this._celTimer = setTimeout(() => this.setState({ celebrateMessage: null }), 2200);
+  };
+
+  fmtValue(g) {
+    const isMoney = g.unit === '$';
+    const cur = isMoney ? '$' + g.current.toLocaleString() : g.current.toLocaleString() + (g.unit ? ' ' + g.unit : '');
+    const tgt = isMoney ? '$' + g.target.toLocaleString() : g.target.toLocaleString() + (g.unit ? ' ' + g.unit : '');
+    return cur + ' of ' + tgt;
+  }
+
+  pct(g) {
+    const range = g.target - g.start;
+    if (!range) return 0;
+    return Math.max(0, Math.min(1, (g.current - g.start) / range));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const circumference = 2 * Math.PI * 54;
+
+    const dashboardGoals = s.goals.map((g) => {
+      const pct = this.pct(g);
+      const milestonesAchieved = g.milestones.filter((m) => m.done).length;
+      return {
+        id: g.id, name: g.name, category: g.category,
+        streakLabel: g.streak + '-day streak',
+        valueLabel: this.fmtValue(g),
+        pctWidth: Math.round(pct * 100) + '%',
+        tasksLabel: g.tasksDoneWeek + '/' + g.tasksTotalWeek + ' tasks this week',
+        milestonesLabel: milestonesAchieved + '/' + g.milestones.length + ' milestones',
+        onOpen: () => this.selectGoal(g.id),
+      };
+    });
+
+    const categories = CATEGORY_LIST.map((cat) => ({
+      label: cat,
+      chipClass: 'tag ' + (s.setupCategory === cat ? 'tag-accent' : 'tag-outline') + ' ' ,
+      onSelect: () => this.selectCategory(cat),
+    }));
+
+    const frequencies = ['Daily', 'Weekly'].map((f) => ({
+      label: f, checked: s.setupFrequency === f, onSelect: () => this.selectFrequency(f),
+    }));
+
+    let selectedGoal = null;
+    const g = s.goals.find((x) => x.id === s.selectedGoalId);
+    if (g) {
+      const pct = this.pct(g);
+      const milestonesAchieved = g.milestones.filter((m) => m.done).length;
+      const avatarStyle = this.props.avatarStyle ?? 'Figure';
+      selectedGoal = {
+        name: g.name, category: g.category,
+        avatarId: 'avatar-' + g.id,
+        initial: (g.name || '?').trim().charAt(0).toUpperCase(),
+        avatarIsFigure: avatarStyle === 'Figure',
+        avatarIsPhoto: avatarStyle === 'Photo',
+        avatarIsInitials: avatarStyle === 'Initials',
+        avatarIsRunner: avatarStyle === 'Runner',
+        markerLeft: s.markerResetGoalId === g.id ? '0%' : Math.round(pct * 100) + '%',
+        runPlayState: s.runningGoalId === g.id ? 'running' : 'paused',
+        pctLabel: Math.round(pct * 100) + '%',
+        valueLabel: this.fmtValue(g),
+        streakLabel: g.streak + '-day streak',
+        tasksLabel: g.tasksDoneWeek + '/' + g.tasksTotalWeek + ' tasks this week',
+        milestonesLabel: milestonesAchieved + '/' + g.milestones.length + ' milestones',
+        goalDaysText: (() => {
+          const due = daysUntil(g.endDate);
+          if (due === null) return 'No deadline';
+          if (due < 0) return Math.abs(due) + (Math.abs(due) === 1 ? ' day overdue' : ' days overdue');
+          if (due === 0) return 'Due today';
+          return due + (due === 1 ? ' day left' : ' days left');
+        })(),
+        goalDaysColor: (() => {
+          const due = daysUntil(g.endDate);
+          return due !== null && due < 0 ? 'var(--color-danger)' : 'var(--color-text)';
+        })(),
+        goalDaysBg: (() => {
+          const due = daysUntil(g.endDate);
+          return due !== null && due < 0 ? 'var(--color-danger-bg)' : 'var(--color-neutral-200)';
+        })(),
+        tasks: g.tasks.map((t) => {
+          const done = t.type === 'qty' ? t.qtyCurrent >= t.qtyTarget : t.done;
+          const isEditing = s.editingTaskId === t.id;
+          return {
+            id: t.id, label: t.label, isQty: t.type === 'qty',
+            check: done ? '✓' : '',
+            borderColor: done ? 'var(--color-accent)' : 'var(--color-divider)',
+            bgColor: done ? 'var(--color-accent)' : 'transparent',
+            opacity: done ? 0.55 : 1,
+            strike: done ? 'line-through' : 'none',
+            qtyLabel: t.type === 'qty' ? t.qtyCurrent + '/' + t.qtyTarget + ' ' + t.qtyUnit : '',
+            onToggle: t.type === 'qty' ? () => this.bumpQty(g.id, t.id) : () => this.toggleTask(g.id, t.id),
+            isEditing,
+            rowDisplay: isEditing ? 'none' : 'flex',
+            onEdit: () => this.startEditTask(t),
+            onDelete: () => this.deleteTask(g.id, t.id),
+          };
+        }),
+        milestones: g.milestones.map((m) => {
+          const due = daysUntil(m.deadline);
+          let statusText, statusColor, statusBg;
+          if (m.done) {
+            statusText = 'Completed';
+            statusColor = 'var(--color-success)'; statusBg = 'var(--color-success-bg)';
+          } else if (due !== null && due < 0) {
+            statusText = 'Past due';
+            statusColor = 'var(--color-danger)'; statusBg = 'var(--color-danger-bg)';
+          } else if (due !== null) {
+            statusText = due + (due === 1 ? ' day left' : ' days left');
+            statusColor = 'var(--color-text)'; statusBg = 'var(--color-neutral-200)';
+          } else {
+            statusText = 'No deadline';
+            statusColor = 'var(--color-text)'; statusBg = 'var(--color-neutral-200)';
+          }
+          return {
+            id: m.id,
+            label: m.label,
+            opacity: m.done ? 1 : 0.55,
+            deadlineLabel: m.done && m.achievedAt
+              ? 'Achieved ' + fmtDate(m.achievedAt)
+              : (m.deadline ? 'By ' + fmtDate(m.deadline) : 'No deadline set'),
+            statusText, statusColor, statusBg,
+            tickLeft: Math.round(pctOf(m.value, g.start, g.target) * 100) + '%',
+            tickColor: m.done ? 'var(--color-accent-2)' : 'var(--color-neutral-400)',
+            tooltipText: m.label + (m.done && m.achievedAt
+              ? ' — achieved ' + fmtDate(m.achievedAt)
+              : m.done ? ' — achieved' : ' — ' + statusText.toLowerCase()),
+            showTooltip: s.activeMilestoneId === m.id,
+            onToggleTooltip: () => this.toggleMilestoneTooltip(m.id),
+          };
+        }),
+      };
+    }
+
+    return {
+      dateline: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+      isLogin: s.screen === 'login',
+      isSignup: s.screen === 'signup',
+      isProfile: s.screen === 'profile',
+      isOnboarding: s.screen === 'onboarding',
+      isSetup: s.screen === 'setup',
+      isDashboard: s.screen === 'dashboard',
+      isDetail: s.screen === 'detail',
+      isAuthed: s.screen !== 'login' && s.screen !== 'signup',
+      menuOpen: s.menuOpen,
+      toggleMenu: this.toggleMenu,
+      goToDashboardFromMenu: this.goToDashboardFromMenu,
+      goToProfileFromMenu: this.goToProfileFromMenu,
+      loginEmail: s.loginEmail, onLoginEmailChange: this.onLoginEmailChange,
+      loginPassword: s.loginPassword, onLoginPasswordChange: this.onLoginPasswordChange,
+      doLogin: this.doLogin,
+      goToSignup: this.goToSignup,
+      goToLogin: this.goToLogin,
+      signupName: s.signupName, onSignupNameChange: this.onSignupNameChange,
+      signupEmail: s.signupEmail, onSignupEmailChange: this.onSignupEmailChange,
+      signupPassword: s.signupPassword, onSignupPasswordChange: this.onSignupPasswordChange,
+      signupDisabled: !s.signupName.trim() || !s.signupEmail.trim() || !s.signupPassword,
+      doSignup: this.doSignup,
+      logout: this.logout,
+      userName: s.userName || 'You',
+      userEmail: s.userEmail,
+      onUserNameChange: this.onUserNameChange,
+      notifBg: s.notifPrefs ? 'var(--color-accent)' : 'var(--color-neutral-300)',
+      notifKnobLeft: s.notifPrefs ? '20px' : '2px',
+      toggleNotifPrefs: this.toggleNotifPrefs,
+      themeVars: s.theme === 'dark' ? DARK_THEME_VARS : '',
+      colorScheme: s.theme === 'dark' ? 'dark' : 'light',
+      themeModes: [
+        { label: 'Light', checked: s.theme === 'light', onSelect: () => this.selectTheme('light') },
+        { label: 'Dark', checked: s.theme === 'dark', onSelect: () => this.selectTheme('dark') },
+      ],
+      goToSetup: this.goToSetup,
+      goToDashboard: this.goToDashboard,
+      skipToDashboard: this.skipToDashboard,
+      createGoal: this.createGoal,
+      categories,
+      isOtherCategory: s.setupCategory === 'Other',
+      setupCustomCategory: s.setupCustomCategory,
+      onCustomCategoryChange: this.onCustomCategoryChange,
+      setupName: s.setupName, onNameChange: this.onNameChange,
+      setupStart: s.setupStart, onStartChange: this.onStartChange,
+      setupTarget: s.setupTarget, onTargetChange: this.onTargetChange,
+      setupUnit: s.setupUnit, onUnitChange: this.onUnitChange,
+      frequencies,
+      setupDisabled: !s.setupName,
+      dashboardGoals,
+      noGoals: dashboardGoals.length === 0,
+      selectedGoal,
+      celebrateMessage: s.celebrateMessage,
+      newTaskLabel: s.newTaskLabel,
+      newTaskTimes: s.newTaskTimes,
+      onNewTaskChange: this.onNewTaskChange,
+      onNewTaskTimesChange: this.onNewTaskTimesChange,
+      onNewTaskKeyDown: this.onNewTaskKeyDown,
+      addTask: this.addTask,
+      newTaskDisabled: !s.newTaskLabel.trim(),
+      editTaskLabel: s.editTaskLabel,
+      editTaskTimes: s.editTaskTimes,
+      onEditLabelChange: this.onEditLabelChange,
+      onEditTimesChange: this.onEditTimesChange,
+      saveEditTask: this.saveEditTask,
+      cancelEditTask: this.cancelEditTask,
+      setupMilestones: s.setupMilestones.map((m) => ({
+        id: m.id,
+        display: m.label + ' — at ' + m.value + (m.deadline ? ' (by ' + fmtDate(m.deadline) + ')' : ''),
+        onRemove: () => this.removeSetupMilestone(m.id),
+      })),
+      setupMsLabel: s.setupMsLabel, onMsLabelChange: this.onMsLabelChange,
+      setupMsValue: s.setupMsValue, onMsValueChange: this.onMsValueChange,
+      addSetupMilestone: this.addSetupMilestone,
+      setupMsDisabled: !s.setupMsLabel.trim() || s.setupMsValue.trim() === '',
+      setupStartDate: s.setupStartDate, onSetupStartDateChange: this.onSetupStartDateChange,
+      setupEndDate: s.setupEndDate, onSetupEndDateChange: this.onSetupEndDateChange,
+      setupDeadlineDays: s.setupDeadlineDays, onSetupDeadlineDaysChange: this.onSetupDeadlineDaysChange,
+      isDeadlineModeDate: s.setupDeadlineMode === 'date',
+      isDeadlineModeDays: s.setupDeadlineMode === 'days',
+      deadlineModes: [
+        { label: 'End date', checked: s.setupDeadlineMode === 'date', onSelect: () => this.selectDeadlineMode('date') },
+        { label: 'Days to reach', checked: s.setupDeadlineMode === 'days', onSelect: () => this.selectDeadlineMode('days') },
+      ],
+      setupMsDeadlineDate: s.setupMsDeadlineDate, onMsDeadlineDateChange: this.onMsDeadlineDateChange,
+      setupMsDeadlineDays: s.setupMsDeadlineDays, onMsDeadlineDaysChange: this.onMsDeadlineDaysChange,
+      isMsDeadlineModeDate: s.setupMsDeadlineMode === 'date',
+      isMsDeadlineModeDays: s.setupMsDeadlineMode === 'days',
+      msDeadlineModes: [
+        { label: 'Date', checked: s.setupMsDeadlineMode === 'date', onSelect: () => this.selectMsDeadlineMode('date') },
+        { label: 'Days from start', checked: s.setupMsDeadlineMode === 'days', onSelect: () => this.selectMsDeadlineMode('days') },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>
